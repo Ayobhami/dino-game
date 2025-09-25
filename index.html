@@ -28,79 +28,144 @@
     <script src="game.js"></script>
 </body>
 </html>
-        let dino, obstacle, score = 0;
-        let isGameOver = false;
+        // Game constants
+        const WIDTH = 800;
+        const HEIGHT = 400;
+        const DINO_SIZE = 50;
+        const BASE_SPEED = 5;
+        const GRAVITY = 0.8;
+        const JUMP_FORCE = -15;
+
+        // Obstacle types
+        const OBSTACLES = {
+            BASIC: { width: 30, height: 50, color: '#ff6666', points: 1 },
+            TALL: { width: 30, height: 80, color: '#ff4444', points: 2 },
+            WIDE: { width: 60, height: 30, color: '#cc4444', points: 2 },
+            FLYING: { width: 40, height: 30, color: '#aa4444', points: 3 }
+        };
+
+        // Game variables
+        let dino;
+        let obstacles = [];
+        let score;
+        let gameOver;
+        let highScore = 0;
+        let level = 1;
+        let frameCounter = 0;
+        let gameSpeed;
 
         function setup() {
-            createCanvas(800, 400);
+            createCanvas(WIDTH, HEIGHT);
+            // Set framerate
+            frameRate(60);
+            // Initialize game
             resetGame();
         }
 
         function resetGame() {
             dino = {
                 x: 100,
-                y: 300,
-                vy: 0,
+                y: HEIGHT - DINO_SIZE - 20,
+                velY: 0,
                 isJumping: false
             };
-            
-            obstacle = {
-                x: width,
-                y: 300
-            };
-            
+
+            obstacles = [];
             score = 0;
-            isGameOver = false;
-            loop();
+            gameOver = false;
+            level = 1;
+            frameCounter = 0;
+            gameSpeed = BASE_SPEED;
+            
+            // Add initial obstacle
+            addObstacle();
+        }
         }
 
         function draw() {
-            background(255);
+            // Clear background
+            background(240);
             
             // Draw ground
-            line(0, 350, width, 350);
+            stroke(100);
+            line(0, HEIGHT - 20, WIDTH, HEIGHT - 20);
             
-            // Draw dino
-            fill(0, 100, 255);
-            rect(dino.x, dino.y, 50, 50);
+            if (!gameOver) {
+                updateGame();
+            } else {
+                showGameOver();
+            }
             
-            if (!isGameOver) {
-                // Move obstacle
-                obstacle.x -= 5;
-                if (obstacle.x < -30) {
-                    obstacle.x = width;
-                    score++;
+            // Draw score and level
+            drawScore();
+        }
+
+        function updateGame() {
+            frameCounter++;
+            
+            // Update dino
+            if (dino.isJumping) {
+                dino.y += dino.velY;
+                dino.velY += GRAVITY;
+                
+                // Ground collision
+                if (dino.y >= HEIGHT - DINO_SIZE - 20) {
+                    dino.y = HEIGHT - DINO_SIZE - 20;
+                    dino.isJumping = false;
+                    dino.velY = 0;
                 }
-                
-                // Draw obstacle
-                fill(0, 200, 0);
-                rect(obstacle.x, obstacle.y, 30, 50);
-                
-                // Jump physics
-                if (dino.isJumping) {
-                    dino.y += dino.vy;
-                    dino.vy += 0.8;
-                    
-                    if (dino.y > 300) {
-                        dino.y = 300;
-                        dino.isJumping = false;
+            }
+
+            // Update game speed based on score
+            level = floor(score / 10) + 1;
+            gameSpeed = BASE_SPEED + (level - 1) * 0.5;
+
+            // Update and draw obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obstacle = obstacles[i];
+                obstacle.x -= gameSpeed;
+
+                // Remove obstacle if off screen
+                if (obstacle.x < -obstacle.width) {
+                    obstacles.splice(i, 1);
+                    score += obstacle.points;
+                } else {
+                    // Draw obstacle
+                    fill(obstacle.color);
+                    noStroke();
+                    rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                }
+
+                // Check collision
+                if (checkCollision(obstacle)) {
+                    gameOver = true;
+                    if (score > highScore) {
+                        highScore = score;
                     }
                 }
-                
-                // Collision check
-                if (dino.x + 50 > obstacle.x && 
-                    dino.x < obstacle.x + 30 &&
-                    dino.y + 50 > obstacle.y) {
-                    isGameOver = true;
-                }
-            } else {
-                // Game Over screen
-                textSize(32);
-                textAlign(CENTER);
-                fill(255, 0, 0);
-                text('Game Over!', width/2, height/2);
-                text('Score: ' + score, width/2, height/2 + 40);
-                text('Click to restart', width/2, height/2 + 80);
+            }
+
+            // Add new obstacle
+            if (frameCounter % 120 === 0 || obstacles.length === 0) {
+                addObstacle();
+            }
+
+            // Draw dino
+            drawDino();
+        }
+
+        function drawDino() {
+            // Draw dino body
+            fill(50, 150, 255);
+            noStroke();
+            rect(dino.x, dino.y, DINO_SIZE, DINO_SIZE);
+            
+            // Draw dino eye
+            fill(255);
+            ellipse(dino.x + DINO_SIZE - 15, dino.y + 15, 10, 10);
+            fill(0);
+            ellipse(dino.x + DINO_SIZE - 15, dino.y + 15, 5, 5);
+        }
             }
             
             // Score display
