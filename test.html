@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Dino Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; }
+    </style>
+</head>
+<body>
+    <script>
+        function setup() {
+            createCanvas(800, 400);
+        }
+
+        function draw() {
+            background(255);
+            fill(0, 100, 255);
+            rect(100, 300, 50, 50);
+            fill(0);
+            textSize(24);
+            text('Dino Test - Click to Start', 300, 200);
+        }
+    </script>
+</body>
+</html>
