@@ -1,43 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dino Game</title>
+    <title>Simple Dino Game</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <style>
         body {
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-            overflow: hidden;
-        }
-        #gameContainer {
-            position: relative;
-            width: 800px;
-            height: 400px;
-        }
-        canvas {
-            border: 2px solid #333;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            height: 100vh;
+            background: #f0f0f0;
         }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <!-- Game canvas will be inserted here by p5.js -->
-    </div>
-    <!-- Load game script -->
-    <script src="game.js"></script>
-    <!-- Fallback message if game doesn't load -->
-    <noscript>
-        <p style="text-align: center; color: red;">
-            Please enable JavaScript to play the Dino Game!
-        </p>
-    </noscript>
+    <script>
+        let dino, obstacle, score = 0;
+        let isGameOver = false;
+
+        function setup() {
+            createCanvas(800, 400);
+            resetGame();
+        }
+
+        function resetGame() {
+            dino = {
+                x: 100,
+                y: 300,
+                vy: 0,
+                isJumping: false
+            };
+            
+            obstacle = {
+                x: width,
+                y: 300
+            };
+            
+            score = 0;
+            isGameOver = false;
+            loop();
+        }
+
+        function draw() {
+            background(255);
+            
+            // Draw ground
+            line(0, 350, width, 350);
+            
+            // Draw dino
+            fill(0, 100, 255);
+            rect(dino.x, dino.y, 50, 50);
+            
+            if (!isGameOver) {
+                // Move obstacle
+                obstacle.x -= 5;
+                if (obstacle.x < -30) {
+                    obstacle.x = width;
+                    score++;
+                }
+                
+                // Draw obstacle
+                fill(0, 200, 0);
+                rect(obstacle.x, obstacle.y, 30, 50);
+                
+                // Jump physics
+                if (dino.isJumping) {
+                    dino.y += dino.vy;
+                    dino.vy += 0.8;
+                    
+                    if (dino.y > 300) {
+                        dino.y = 300;
+                        dino.isJumping = false;
+                    }
+                }
+                
+                // Collision check
+                if (dino.x + 50 > obstacle.x && 
+                    dino.x < obstacle.x + 30 &&
+                    dino.y + 50 > obstacle.y) {
+                    isGameOver = true;
+                }
+            } else {
+                // Game Over screen
+                textSize(32);
+                textAlign(CENTER);
+                fill(255, 0, 0);
+                text('Game Over!', width/2, height/2);
+                text('Score: ' + score, width/2, height/2 + 40);
+                text('Click to restart', width/2, height/2 + 80);
+            }
+            
+            // Score display
+            textSize(24);
+            textAlign(LEFT);
+            fill(0);
+            text('Score: ' + score, 10, 30);
+        }
+
+        function mousePressed() {
+            if (isGameOver) {
+                resetGame();
+            } else if (!dino.isJumping) {
+                dino.isJumping = true;
+                dino.vy = -15;
+            }
+        }
+
+        function keyPressed() {
+            if ((keyCode === 32 || keyCode === UP_ARROW) && !dino.isJumping) {
+                dino.isJumping = true;
+                dino.vy = -15;
+            }
+        }
+    </script>
 </body>
 </html>
