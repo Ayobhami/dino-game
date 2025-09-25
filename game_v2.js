@@ -19,6 +19,7 @@ let animationFrame = 0;
 let dinoRunImage1;
 let dinoRunImage2;
 let dinoJumpImage;
+let backgroundImage;
 
 // Base64 encoded dino images
 const dinoRun1Base64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGJSURBVFiF7ZexSgNBEIa/OSUQiUWwEUQQbAQrwUoQX8DKB7ASX8DKB7ASX8DOB7ASKxsRK0EEwUYQQbARRBAScsl+FndwxCN3l7vkcuAPU+zO7P6zs7OzC5mmaZqmaZrGEnYB51wJ2AAWgCHwCPTN7DUmOOdcDqgB60AJGACPQNvMPmJjp4qdc3ngAlgdM/0MHJjZS0RsDjgDqmOmn4C6mfVjYifdwATOgeUJ88vAhXMuNyXmCNieML8ENCKxk+4AMzsxs6/AJbBnZu0p4b/EAo1QbFQxUAXaZnYNvE+7vX8i+RZ458rArpk9AW3gzcxek8T+9wQKwCGwambF8CueAedm9p4kdtrLmCTKwDawCHwDPaBlZh+xQRm2bJqm+QvJt2DYzggNQk8uhN4Qmo+J7QM3wHsoKAe0nHPnzrliVGyS4+H2x5PTUP6vhs9ngJaZjSLulzlgy8z2nerWJ+BjwtwnsD/h5APQA+rOufmY2HHi4R8wD9SBdbLPaTd8dszsPTY209A0zR/0A+EPf9F3AV68AAAAAElFTkSuQmCC';
@@ -32,6 +33,7 @@ function preload() {
     dinoRunImage1 = loadImage(dinoRun1Base64);
     dinoRunImage2 = loadImage(dinoRun2Base64);
     dinoJumpImage = loadImage(dinoJumpBase64);
+    backgroundImage = loadImage('assets/Untitled.png');
     console.log('Images loaded successfully');
 }
 
@@ -63,8 +65,23 @@ function resetGame() {
 }
 
 function draw() {
-    // Clear background
-    background(240);
+    // Draw background image
+    if (backgroundImage) {
+        // Scale the background image to fill the canvas
+        let bgScale = Math.max(WIDTH / backgroundImage.width, HEIGHT / backgroundImage.height);
+        let scaledWidth = backgroundImage.width * bgScale;
+        let scaledHeight = backgroundImage.height * bgScale;
+        
+        // Center the background image
+        let x = (WIDTH - scaledWidth) / 2;
+        let y = (HEIGHT - scaledHeight) / 2;
+        
+        // Draw the background
+        image(backgroundImage, x, y, scaledWidth, scaledHeight);
+    } else {
+        // Fallback to solid color if image isn't loaded
+        background(240);
+    }
     
     if (!isGameOver) {
         updateGame();
