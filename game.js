@@ -2,11 +2,17 @@
 const WIDTH = 800;
 const HEIGHT = 400;
 const DINO_SIZE = 50;
-const OBSTACLE_WIDTH = 30;
-const OBSTACLE_HEIGHT = 50;
-const OBSTACLE_SPEED = 6;
+const BASE_SPEED = 5;
 const GRAVITY = 0.8;
 const JUMP_FORCE = -15;
+
+// Obstacle types
+const OBSTACLES = {
+    BASIC: { width: 30, height: 50, color: '#ff6666', points: 1 },
+    TALL: { width: 30, height: 80, color: '#ff4444', points: 2 },
+    WIDE: { width: 60, height: 30, color: '#cc4444', points: 2 },
+    FLYING: { width: 40, height: 30, color: '#aa4444', points: 3 }
+};
 
 // Game variables
 let dino;
