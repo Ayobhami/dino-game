@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple Dino Game</title>
+    <title>Dino Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <style>
         body {
@@ -12,10 +14,20 @@
             height: 100vh;
             background: #f0f0f0;
         }
+        canvas {
+            border: 2px solid #333;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        #game-container {
+            position: relative;
+        }
     </style>
 </head>
 <body>
-    <script>
+    <div id="game-container"></div>
+    <script src="game.js"></script>
+</body>
+</html>
         let dino, obstacle, score = 0;
         let isGameOver = false;
 

@@ -1,19 +1,24 @@
-let dino, obstacle, score;
+// Game constants
+const WIDTH = 800;
+const HEIGHT = 400;
+const DINO_SIZE = 50;
+const OBSTACLE_WIDTH = 30;
+const OBSTACLE_HEIGHT = 50;
+const OBSTACLE_SPEED = 6;
+const GRAVITY = 0.8;
+const JUMP_FORCE = -15;
+
+// Game variables
+let dino;
+let obstacle;
+let score;
+let gameOver;
+let highScore = 0;
 
 function setup() {
-    createCanvas(800, 400);
-    score = 0;
-    
-    // Initialize dino
-    dino = {
-        x: 100,
-        y: 300,
-        size: 50,
-        velocityY: 0,
-        gravity: 0.8,
-        jumpForce: -15,
-        isJumping: false
-    };
+    // Create canvas and center it
+    const canvas = createCanvas(WIDTH, HEIGHT);
+    canvas.parent('game-container');
 
 // Game variables
 let dino;
