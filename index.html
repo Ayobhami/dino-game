@@ -1,0 +1,284 @@
+<!DOCTYPE html><!DOCTYPE html>
+
+<html><html>
+
+<head><head>
+
+    <title>Dino Game</title>    <title>Dino Game</title>
+
+    <meta charset="UTF-8">    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+
+    <style>    <style>
+
+        * {        * {
+
+            margin: 0;            margin: 0;
+
+            padding: 0;            padding: 0;
+
+            box-sizing: border-box;            box-sizing: border-box;
+
+        }            touch-action: none;
+
+            user-select: none;
+
+        body {            -webkit-touch-callout: none;
+
+            margin: 0;        }
+
+            display: flex;
+
+            justify-content: center;        body {
+
+            align-items: center;            margin: 0;
+
+            min-height: 100vh;            display: flex;
+
+            background: #000;            justify-content: center;
+
+        }            align-items: center;
+
+            min-height: 100vh;
+
+        #game-container {            background: #f0f0f0;
+
+            width: 100%;            overflow: hidden;
+
+            height: 100vh;        }
+
+            display: flex;
+
+            justify-content: center;        #game-container {
+
+            align-items: center;            position: relative;
+
+        }            width: 100%;
+
+            height: 100vh;
+
+        canvas {            display: flex;
+
+            max-width: 100%;            justify-content: center;
+
+            max-height: 100%;            align-items: center;
+
+        }        }
+
+    </style>
+
+</head>        canvas {
+
+<body>            border: 2px solid #333;
+
+    <div id="game-container"></div>            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+
+    <script src="game.js"></script>            max-width: 100%;
+
+</body>            max-height: 100%;
+
+</html>        }
+
+        #mobile-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        #jump-button {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            touch-action: manipulation;
+        }
+
+        @media (orientation: portrait) {
+            #game-container {
+                transform: rotate(90deg);
+                transform-origin: center center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #mobile-controls {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+    <div id="mobile-controls">
+        <button id="jump-button">JUMP</button>
+    </div>
+        <script src="game_v2.js"></script>
+</body>
+</html>
+            WIDE: { width: 60, height: 30, color: '#cc4444', points: 2 },
+            FLYING: { width: 40, height: 30, color: '#aa4444', points: 3 }
+        };
+
+        // Game variables
+        let dino;
+        let obstacles = [];
+        let score;
+        let gameOver;
+        let highScore = 0;
+        let level = 1;
+        let frameCounter = 0;
+        let gameSpeed;
+=======
+        let isGameOver = false;
+>>>>>>> main
+
+        function setup() {
+            createCanvas(WIDTH, HEIGHT);
+            // Set framerate
+            frameRate(60);
+            // Initialize game
+            resetGame();
+        }
+
+        function resetGame() {
+            dino = {
+                x: 100,
+                y: HEIGHT - DINO_SIZE - 20,
+                velY: 0,
+                isJumping: false
+            };
+
+            obstacles = [];
+            score = 0;
+            gameOver = false;
+            level = 1;
+            frameCounter = 0;
+            gameSpeed = BASE_SPEED;
+            
+            // Add initial obstacle
+            addObstacle();
+        }
+        }
+
+        function draw() {
+            // Clear background
+            background(240);
+            
+            // Draw ground
+            stroke(100);
+            line(0, HEIGHT - 20, WIDTH, HEIGHT - 20);
+            
+            if (!gameOver) {
+                updateGame();
+            } else {
+                showGameOver();
+            }
+            
+            // Draw score and level
+            drawScore();
+        }
+
+        function updateGame() {
+            frameCounter++;
+            
+            // Update dino
+            if (dino.isJumping) {
+                dino.y += dino.velY;
+                dino.velY += GRAVITY;
+                
+                // Ground collision
+                if (dino.y >= HEIGHT - DINO_SIZE - 20) {
+                    dino.y = HEIGHT - DINO_SIZE - 20;
+                    dino.isJumping = false;
+                    dino.velY = 0;
+                }
+            }
+
+            // Update game speed based on score
+            level = floor(score / 10) + 1;
+            gameSpeed = BASE_SPEED + (level - 1) * 0.5;
+
+            // Update and draw obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obstacle = obstacles[i];
+                obstacle.x -= gameSpeed;
+
+                // Remove obstacle if off screen
+                if (obstacle.x < -obstacle.width) {
+                    obstacles.splice(i, 1);
+                    score += obstacle.points;
+                } else {
+                    // Draw obstacle
+                    fill(obstacle.color);
+                    noStroke();
+                    rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                }
+
+                // Check collision
+                if (checkCollision(obstacle)) {
+                    gameOver = true;
+                    if (score > highScore) {
+                        highScore = score;
+                    }
+                }
+            }
+
+            // Add new obstacle
+            if (frameCounter % 120 === 0 || obstacles.length === 0) {
+                addObstacle();
+            }
+
+            // Draw dino
+            drawDino();
+        }
+
+        function drawDino() {
+            // Draw dino body
+            fill(50, 150, 255);
+            noStroke();
+            rect(dino.x, dino.y, DINO_SIZE, DINO_SIZE);
+            
+            // Draw dino eye
+            fill(255);
+            ellipse(dino.x + DINO_SIZE - 15, dino.y + 15, 10, 10);
+            fill(0);
+            ellipse(dino.x + DINO_SIZE - 15, dino.y + 15, 5, 5);
+        }
+            }
+            
+            // Score display
+            textSize(24);
+            textAlign(LEFT);
+            fill(0);
+            text('Score: ' + score, 10, 30);
+        }
+
+        function mousePressed() {
+            if (isGameOver) {
+                resetGame();
+            } else if (!dino.isJumping) {
+                dino.isJumping = true;
+                dino.vy = -15;
+            }
+        }
+
+        function keyPressed() {
+            if ((keyCode === 32 || keyCode === UP_ARROW) && !dino.isJumping) {
+                dino.isJumping = true;
+                dino.vy = -15;
+            }
+        }
+    </script>
+</body>
+</html>
